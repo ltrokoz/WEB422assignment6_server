@@ -23,28 +23,21 @@ passport.use(
       secretOrKey: process.env.JWT_SECRET,
     },
     async function verify(payload, done) {
-      if (!payload) {
-        return done(null, false);
-      }
+      if (!payload) { return done(null, false); }
       let user;
       try { user = await userService.byId(payload._id);
       } catch (err) {
         console.log(err);
         return done(null, false);
       }
-      if (!user) {
-        return done(null, false);
-      }
+      if (!user) { return done(null, false); }
       done(null, user);
     }
   )
 );
 
 function createToken(id, username) {
-  const payload = {
-    _id: id,
-    userName: username,
-  };
+  const payload = { _id: id, userName: username };
   const secret = process.env.JWT_SECRET;
   const options = { expiresIn: "3d" };
 
@@ -60,8 +53,7 @@ app.post("/api/user/register", function (req, res) {
     .catch((err) => { res.status(422).json({ message: err }); });
 });
 
-app.post("/api/user/login", function (req, res) {
-  userService
+app.post("/api/user/login", function (req, res) { userService
     .checkUser(req.body)
     .then((user) => { console.log(user);
       res.status(200).json({ token: createToken(user._id, user.userName) });
@@ -72,8 +64,7 @@ app.post("/api/user/login", function (req, res) {
 
 app.get("/api/user/favourites",
   passport.authenticate("jwt", { session: false }),
-  function (req, res) { console.log(req.user);
-    userService
+  function (req, res) { console.log(req.user); userService
       .getFavourites(req.user._id)
       .then((fav) => { res.status(200).json(fav); })
       .catch((err) => { res.status(403).json({ message: err }); });
@@ -82,8 +73,7 @@ app.get("/api/user/favourites",
 
 app.put("/api/user/favourites/:id",
   passport.authenticate("jwt", { session: false }),
-  function (req, res) {
-    userService
+  function (req, res) { userService
       .addFavourite(req.user._id, req.params.id)
       .then((fav) => { res.status(200).json(fav); })
       .catch((err) => { res.status(400).json({ message: err }); });
@@ -92,8 +82,7 @@ app.put("/api/user/favourites/:id",
 
 app.delete("/api/user/favourites/:id",
   passport.authenticate("jwt", { session: false }),
-  function (req, res) {
-    userService
+  function (req, res) { userService
       .removeFavourite()
       .then((fav) => { res.status(200).json(fav); })
       .catch((err) => { res.status(400).json({ message: err }); });
